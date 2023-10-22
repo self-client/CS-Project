@@ -192,6 +192,25 @@ def sql_to_csv():
         w.writerow(headers)
         w.writerows(data)
 
-def csv_to_sql(CsvFileName:str):
-    with open(f"{CsvFileName}.csv",'r') as f:
-        ...
+def csv_to_sql(CsvFileName:str,TableName:str):
+    with open(f"{CsvFileName}.csv","r") as f:
+        reader=csv.reader(f)
+        csv_list=[]
+        for x in reader:
+            x=tuple(x)
+            csv_list.append(x)
+        headers=csv_list.pop(0)
+        csv_list=tuple(csv_list)
+        #print(csv_list)
+    header=input("enter your header query seperate every query with ',' (format: <name> <data_type> <constraint>, <--repeat):")
+    headers=input("enter your headers without the the datatype and constraint:")
+    with mysql.connector.connect(host=hostname,user=user,passwd=password,database=database) as f:
+        cursor=f.cursor()
+        query=f"create table {TableName}({header})"
+        #cursor.execute(query)
+        for x in csv_list:
+            #print(x)
+            query=f"insert into {TableName}({headers}) values{x}"
+            print(query)
+            cursor.execute(query)
+        f.commit()
