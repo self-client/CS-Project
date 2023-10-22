@@ -78,7 +78,6 @@ def remove_table():
         elif type(condition)==type(str()):
             query=f"delete from pokemon where {condition_header}{condition_operator}'{condition}'"
 
-        query=f"delete from pokemon where {condition_header}{condition_operator}{condition}"
         confirmation=input("are you sure you want to delete this data? [y/n]:")
         if confirmation.lower() in 'y':
             cursor.execute(query)
