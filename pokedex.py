@@ -1,16 +1,13 @@
 import mysql.connector
-import json
 import pandas 
+import csv
 
 #with mysql.connector.connect(host=hostname,user=user,passwd=password,database=database) as f:
 
-
-with open('C:\\Users\\Pratham\\Desktop\\Projetcs\\cs project\\config.json','r') as f:
-    config=json.load(f)
-hostname=config.get("hostname")
-user=config.get("user")
-password=config.get("password")
-database=config.get("database")
+hostname='localhost'
+user='root'
+password='your-password'
+database='pokedex'
 
 def show_table():
     with mysql.connector.connect(host=hostname,user=user,passwd=password,database=database) as f:
@@ -62,6 +59,139 @@ def insert_table():
     else:
         return
 
-def remove_table():...    
-              
-def menu():...
+def remove_table():
+    with mysql.connector.connect(host=hostname,user=user,passwd=password,database=database) as f:
+        cursor=f.cursor()
+        query="desc pokemon"
+        cursor.execute(query)
+        desc=cursor.fetchall()
+        print("Headers:")
+        for x in range(len(desc)):
+            print(f"{desc[x][0]}",end=",")
+        print()
+        condition_header=input("enter the condition column:")
+        condition_operator=input("enter the condition operator:")
+        condition=eval(input("enter the value for condition:"))
+
+        query=f"delete from pokemon where {condition_header}{condition_operator}{condition}"
+        confirmation=input("are you sure you want to delete this data? [y/n]:")
+        if confirmation.lower() in 'y':
+            cursor.execute(query)
+            f.commit()
+            print("deleted the data!")
+            i=input("do you want to see the table after this change? [y/n]:")
+            if i.lower() in 'y':
+                show_table()
+                return
+            else:
+                print("ending the program!")
+                pass
+            
+        else:
+            query=""
+            print("deletion has been stopped!")
+            return
+
+def Select_table():
+    with mysql.connector.connect(host=hostname,user=user,passwd=password,database=database) as f:
+        cursor=f.cursor()
+        
+        query="desc pokemon"
+        cursor.execute(query)
+        desc=cursor.fetchall()
+        print("Headers:")
+        for x in range(len(desc)):
+            print(f"{desc[x][0]}",end=",")
+        print()
+
+        condition_header=input("enter the condition column:")
+        condition_operator=input("enter the condition operator:")
+        condition=eval(input("enter the value for condition:"))
+        print()
+
+        query_data=[]
+        while True:
+            print()
+            ColumnName=input("enter the column name:")
+            query_data.append(ColumnName)
+            Conti=input("do you want to continue? [y/n]?:")
+            if Conti.lower() not in ['y']:
+                break
+        print()
+
+        leng=len(query_data)
+        cstring=""
+        for x in range(leng):
+            if x==0:
+                cstring+=f"{query_data[x]}"
+            else:
+                cstring+=f",{query_data[x]}"
+
+        if type(condition) == type(int()):
+            qstring=f"select {cstring} from pokemon where {condition_header}{condition_operator}{condition}"
+        elif type(condition) == type(str()):
+            qstring=f"select {cstring} from pokemon where {condition_header}{condition_operator}'{condition}'"
+        cursor.execute(qstring)
+        data=cursor.fetchall()
+            
+
+        df=pandas.DataFrame(data=data,columns=query_data)
+        df=df.to_string()
+        print(df)
+
+def update_table():
+    with mysql.connector.connect(host=hostname,user=user,passwd=password,database=database) as f:
+        cursor=f.cursor()
+
+        print("loading all the data from the sql table!\nThis may take some time!\n")
+        show_table()
+        print()
+        query="desc pokemon"
+        cursor.execute(query)
+        desc=cursor.fetchall()
+        print("Headers:")
+        for x in range(len(desc)):
+            print(f"{desc[x][0]}",end=",")
+        print()
+        cname=input('enter the coulmn name you want to update:')
+        value=eval(input("enter the value for this column:"))
+        condition_header=input("enter the condition header:")
+        condition_operator=input('enter the operator:')
+        condition=eval(input("enter the condition:"))
+        print()
+        if type(condition) == type(int()):
+            query=f"update pokemon set {cname}={value} where {condition_header}{condition_operator}{condition}"
+        elif type(condition)==type(str()):
+            query=f"update pokemon set {cname}={value} where {condition_header}{condition_operator}'{condition}'"
+        
+        cursor.execute(query)
+        f.commit()
+
+def sql_to_csv():
+    with mysql.connector.connect(host=hostname,user=user,passwd=password,database=database) as f:
+        cursor=f.cursor()
+        query="desc pokemon"
+        cursor.execute(query)
+        desc=cursor.fetchall()
+
+        headers=[]
+        for x in range(len(desc)):
+            headers.append(desc[x][0])
+        headers=tuple(headers)
+
+        query="select * from pokemon"
+
+        cursor.execute(query)
+        data=cursor.fetchall()
+
+        data=tuple(data)
+
+    CsvName=input('enter the csv file name (which will be generated and created):')
+    with open(f"{CsvName}.csv","w",newline='\n') as fo:
+        w=csv.writer(fo)
+        w.writerow(headers)
+        w.writerows(data)
+
+def csv_to_sql(CsvFileName:str):
+    with open(f"{CsvFileName}.csv",'r') as f:
+        ...
