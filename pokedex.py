@@ -3,7 +3,7 @@ import pandas
 import csv
 from details import sql_details
 #with mysql.connector.connect(host=hostname,user=user,passwd=password,database=database) as f:
-hostname,user,passwd,database=sql_details()
+hostname,user,password,database=sql_details()
 
 def show_table():
     with mysql.connector.connect(host=hostname,user=user,passwd=password,database=database) as f:
