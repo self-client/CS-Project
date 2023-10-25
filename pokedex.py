@@ -3,6 +3,7 @@ import pandas
 import csv
 from details import sql_details
 #with mysql.connector.connect(host=hostname,user=user,passwd=password,database=database) as f:
+#create table pokedex(sno int primary key,ranks int,name varchar(255),type1 varchar(20),total int,hp int,attack int,defense int,sp_atk int,sp_def int,speed int,generation int,legendary varchar(25));
 hostname,user,password,database=sql_details()
 
 def show_table():
